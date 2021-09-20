@@ -5,7 +5,9 @@ target 'marvel' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-  # Pods for 
+  # Pods for
+  pod 'CryptoSwift'
+  pod 'RxRealm'
   pod 'RxSwift'
   pod 'RxCocoa'
 
