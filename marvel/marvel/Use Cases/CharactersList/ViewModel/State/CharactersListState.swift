@@ -9,6 +9,6 @@ import Foundation
 
 enum CharactersListState {
     case loading
-    case loaded (_ components: [CharacterComponentProtocol])
+    case loaded
     case error(_ error: Error)
 }

@@ -70,7 +70,7 @@ struct Log {
         debug(responseLog)
     }
     
-    static func debug(_ text: String?) {
+    static func debug(_ text: Any?) {
         #if DEBUG
         print(text ?? "")
         #endif
