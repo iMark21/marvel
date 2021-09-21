@@ -62,15 +62,18 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
         
         let repository: MarvelRepositoryProtocol = MarvelRepository.init()
         repository
-            .fetchCharacters()
-            .subscribe(on: appSchedulers.background)
-            .observe(on: appSchedulers.main)
+            .subscribeCharacters()
             .subscribe(onNext: { [weak self] result in
-                self?.output.state.onNext(.loaded)
+                self?.output.state.onNext(.loaded([]))
             }, onError: { [weak self] error in
                 Log.debug(error.localizedDescription)
                 self?.output.state.onNext(.error(error))
             }).disposed(by: disposeBag)
     }
     
+    // MARK: - Private methods
+    
+    private func save(from response: CharactersListResponse) {
+        
+    }
 }
