@@ -7,13 +7,15 @@
 
 import Foundation
 import RxSwift
+import Realm
+import RealmSwift
 
 protocol MarvelRepositoryProtocol {
     var apiClient: APIClientProtocol { get }
     var databaseClient: DatabaseProtocol { get }
     
-    /// Specialties
-    func fetchCharacters() -> Observable<CharactersListResponse>
+    /// Characters
+    func subscribeCharacters() -> Observable<[Character]>
 }
 
 class MarvelRepository: MarvelRepositoryProtocol {
@@ -36,9 +38,36 @@ class MarvelRepository: MarvelRepositoryProtocol {
     
     // MARK: - Characters
     
-    func fetchCharacters<T: Codable>() -> Observable<T> {
+    private func fetchCharacters() -> Observable<CharactersListResponse> {
         let request = CharactersRequest.init()
         return fetchNetworkRequest(request: request)
+    }
+    
+    func subscribeCharacters<T: Codable & Object>() -> Observable<[T]> {
+        
+        fetchCharacters()
+            .map { response in
+                if let objects = response.data?.results {
+                    self.databaseClient.save(objects: objects)
+                }
+            }
+            .subscribe()
+            .disposed(by: disposeBag)
+
+        
+        return subscribeDatabaseChanges(type: T.self)
+            .flatMap { result -> Observable<[T]> in
+                .just(result)
+            }
+    }
+}
+
+// MARK: - Local Access
+
+extension MarvelRepository {
+    
+    func subscribeDatabaseChanges<T: Codable & Object>(type: T.Type) -> Observable<[T]> {
+        return self.databaseClient.observe(type: type)
     }
 }
 

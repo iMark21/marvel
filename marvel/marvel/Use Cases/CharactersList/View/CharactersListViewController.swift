@@ -32,11 +32,7 @@ class CharactersListViewController: UIViewController {
     // MARK: - Setup ViewModel
 
     private func setupViewModel() {
-        guard let viewModel = viewModel else {
-            Log.debug("Characters List View Model not initialized")
-            return
-        }
-        viewModel.output
+        viewModel?.output
             .state
             .subscribe(onNext: { [weak self] state in
                 //Evaluate state of view
