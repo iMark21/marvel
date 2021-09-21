@@ -28,6 +28,7 @@ extension CharactersListViewModel {
     
     struct Output {
         let state: PublishSubject<CharactersListState>
+        var datasource: PublishSubject<[CharacterComponentProtocol]>
     }
 }
 
@@ -42,6 +43,7 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
     // MARK: - Private vars
     let disposeBag: DisposeBag
     let appSchedulers: AppSchedulers
+    var characters: [Character]
     
     // MARK: - Init
     init(repository: MarvelRepositoryProtocol) {
@@ -49,8 +51,10 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
             repository: repository
         )
         self.output = Output.init(
-            state: PublishSubject<CharactersListState>()
+            state: PublishSubject<CharactersListState>(),
+            datasource: PublishSubject<[CharacterComponentProtocol]>()
         )
+        self.characters = []
         self.disposeBag = DisposeBag()
         self.appSchedulers = MarvelAppSchedulers()
     }
@@ -63,17 +67,28 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
         let repository: MarvelRepositoryProtocol = MarvelRepository.init()
         repository
             .subscribeCharacters()
+            .flatMap({ [weak self] characters -> Observable<[CharacterComponentProtocol]> in
+                
+                /// Check datasource is changed
+                let isEqual = characters == self?.characters ?? []
+                if isEqual { return .empty() }
+                
+                var components : [CharacterComponentProtocol] = []
+                characters.forEach { character in
+                    let component = CharacterComponentViewModel.init(
+                        character: character
+                    )
+                    components.append(component)
+                }
+                self?.characters = characters
+                return .just(components)
+            })
             .subscribe(onNext: { [weak self] result in
-                self?.output.state.onNext(.loaded([]))
+                Log.debug("Actualiza")
+                self?.output.datasource.onNext(result)
             }, onError: { [weak self] error in
                 Log.debug(error.localizedDescription)
                 self?.output.state.onNext(.error(error))
             }).disposed(by: disposeBag)
-    }
-    
-    // MARK: - Private methods
-    
-    private func save(from response: CharactersListResponse) {
-        
     }
 }

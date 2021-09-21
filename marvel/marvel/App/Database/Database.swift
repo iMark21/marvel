@@ -32,8 +32,21 @@ class Database: DatabaseProtocol {
         
         Log.debug("Object \(T.self) (\(result.count) count) list is available")
         
-        return Observable.array(from: result)
-            .observe(on: appSchedulers.background)
+        return Observable.changeset(from: result)
+            .debug("Observable!!")
+            .flatMap({ results, changes -> Observable<[T]> in
+                if let changes = changes {
+                    // it's an update
+                    Log.debug("deleted: \(changes.deleted)")
+                    Log.debug("inserted: \(changes.inserted)")
+                    Log.debug("updated: \(changes.updated)")
+                } else {
+                    // it's the initial data
+                    Log.debug(results)
+                }
+                
+                return .just(results.toArray())
+            })
     }
     
     func save<T: Object>(objects: [T?]?) {
@@ -43,9 +56,7 @@ class Database: DatabaseProtocol {
             let result = objects.compactMap { $0 }
 
             Observable.from(result)
-                .subscribe(on: appSchedulers.background)
-                .observe(on: appSchedulers.main)
-                .subscribe(realm.rx.add())
+                .subscribe(realm.rx.add(update: .all))
                 .disposed(by: disposeBag)
         }
     }

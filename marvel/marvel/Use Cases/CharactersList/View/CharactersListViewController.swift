@@ -7,13 +7,18 @@
 
 import UIKit
 import RxSwift
+import RxCocoa
 
 class CharactersListViewController: UIViewController {
-
+    
+    // MARK: - IBOutlets
+    @IBOutlet weak var tableView: UITableView!
+    
     // MARK: Public vars
     var viewModel: CharactersListViewModelProtocol?
-    
-    // MARK: Private vars
+    var components: [CharacterComponentViewModel]?
+        
+    // MARK: Private RX vars
     private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
@@ -26,7 +31,43 @@ class CharactersListViewController: UIViewController {
     // MARK: - Setup View
     
     private func setupView() {
+        setupTableView()
         view.backgroundColor = .red
+    }
+    
+    // MARK: - Table View
+    
+    private func setupTableView() {
+        tableView.register(UINib(
+            nibName: CharacterComponentViewModel
+                .Constants
+                .cellIdentifier,
+            bundle: nil
+            ), forCellReuseIdentifier: CharacterComponentViewModel
+                .Constants
+                .cellIdentifier
+        )
+        /// Background color
+        tableView.separatorColor = .clear
+        tableView.backgroundColor = .systemGroupedBackground
+        /// Bind datasource
+        bindTableView()
+    }
+    
+    private func bindTableView() {
+        viewModel?.output.datasource
+            .bind(to: tableView.rx.items) { tableView, _, component in
+                
+            guard let cell = tableView.dequeueReusableCell(
+                    withIdentifier: CharacterComponentViewModel
+                        .Constants
+                        .cellIdentifier) as? CharacterComponent else {
+                
+                return UITableViewCell()
+            }
+            cell.setup(component: component)
+            return cell
+        }.disposed(by: disposeBag)
     }
     
     // MARK: - Setup ViewModel
