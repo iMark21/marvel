@@ -27,10 +27,8 @@ extension APIRequest {
             resolvingAgainstBaseURL: false) else {
                 fatalError("Unable to create URL components")
         }
-        
-        components.queryItems = defaultQueryItems()
-        
-        let queryItems = parameters.map {
+                
+        components.queryItems = parameters.map {
             URLQueryItem(
                 name: String($0),
                 value: String($1)
@@ -39,14 +37,15 @@ extension APIRequest {
                     )
             )
         }
-        components.queryItems?.append(contentsOf: queryItems)
-        
+        components.queryItems?.append(contentsOf: defaultQueryItems())
+
         guard let url = components.url else {
             fatalError("Could not get url")
         }
 
         var request = URLRequest.init(url: url)
         request.httpMethod = method.rawValue
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         
         if let body = body {
             request.setValue(

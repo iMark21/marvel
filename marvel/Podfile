@@ -6,7 +6,9 @@ target 'marvel' do
   use_frameworks!
 
   # Pods for
+  pod 'SDWebImage'
   pod 'CryptoSwift'
+  pod 'RxDataSources'
   pod 'RxRealm'
   pod 'RxSwift'
   pod 'RxCocoa'

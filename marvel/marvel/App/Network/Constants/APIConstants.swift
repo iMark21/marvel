@@ -26,5 +26,7 @@ struct APIConstants {
         static let apikey = "apikey"
         static let hash = "hash"
         static let ts = "ts"
+        static let offset = "offset"
+        static let limit = "limit"
     }
 }

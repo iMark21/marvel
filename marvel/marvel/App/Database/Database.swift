@@ -56,9 +56,8 @@ class Database: DatabaseProtocol {
             let result = objects.compactMap { $0 }
 
             Observable.from(result)
-                .subscribe(realm.rx.add(update: .all))
+                .subscribe(realm.rx.add(update: .modified))
                 .disposed(by: disposeBag)
         }
     }
-    
 }

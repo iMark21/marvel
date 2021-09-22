@@ -14,9 +14,12 @@ final class CharactersRequest: APIRequest {
     var path: String
     var parameters: [String : String]
 
-    init() {
+    init(offset: Int, limit: Int) {
         self.method = .GET
         self.path = "\(APIConstants.Path.characters)"
-        self.parameters = [:]
+        self.parameters = [
+            APIConstants.ParamKeys.limit : "\(limit)",
+            APIConstants.ParamKeys.offset : "\(offset)"
+        ]
     }
 }
