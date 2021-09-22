@@ -26,9 +26,10 @@ class CharacterComponent: UITableViewCell {
         
         self.titleLabel.text = component.output.name
         guard let url = component.output.imageUrl else {
+            imageViewBackground.image = nil
             return
         }
-        self.imageViewBackground?.loadImage(withUrl: url)
+        self.imageViewBackground.load(url: url)
     }
     
     // MARK: - Setup View

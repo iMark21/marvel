@@ -7,6 +7,7 @@
 
 import Foundation
 import RxSwift
+import RxCocoa
 
 // MARK: - Protocol
 
@@ -16,6 +17,7 @@ protocol CharactersListViewModelProtocol {
     
     /// Methods
     func setup()
+    func loadNextPage()
 }
 
 // MARK: - I/O
@@ -28,7 +30,7 @@ extension CharactersListViewModel {
     
     struct Output {
         let state: PublishSubject<CharactersListState>
-        var datasource: PublishSubject<[CharacterComponentProtocol]>
+        let dataSource: BehaviorRelay<[ComponentsDataSource]>
     }
 }
 
@@ -41,9 +43,11 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
     var output: Output
     
     // MARK: - Private vars
-    let disposeBag: DisposeBag
-    let appSchedulers: AppSchedulers
-    var characters: [Character]
+    private let disposeBag: DisposeBag
+    private let appSchedulers: AppSchedulers
+    private var paginator: MarvelPaginator
+    private var characters: [Character]
+    private var dataSource: [ComponentsDataSource]
     
     // MARK: - Init
     init(repository: MarvelRepositoryProtocol) {
@@ -52,43 +56,93 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
         )
         self.output = Output.init(
             state: PublishSubject<CharactersListState>(),
-            datasource: PublishSubject<[CharacterComponentProtocol]>()
+            dataSource: BehaviorRelay<[ComponentsDataSource]>(value: [])
+        )
+        self.paginator = MarvelPaginator.init(
+            offset: 0,
+            limit: 20
         )
         self.characters = []
+        self.dataSource = [ComponentsDataSource.init(
+                            uniqueId: UUID().uuidString,
+                            header: "",
+                            items: [])]
         self.disposeBag = DisposeBag()
         self.appSchedulers = MarvelAppSchedulers()
     }
     
     // MARK: - Load content
+    
     func setup() {
         /// Loading
         output.state.onNext(.loading)
         
-        let repository: MarvelRepositoryProtocol = MarvelRepository.init()
-        repository
-            .subscribeCharacters()
-            .flatMap({ [weak self] characters -> Observable<[CharacterComponentProtocol]> in
-                
-                /// Check datasource is changed
-                let isEqual = characters == self?.characters ?? []
-                if isEqual { return .empty() }
-                
-                var components : [CharacterComponentProtocol] = []
-                characters.forEach { character in
-                    let component = CharacterComponentViewModel.init(
-                        character: character
-                    )
-                    components.append(component)
-                }
-                self?.characters = characters
-                return .just(components)
-            })
+        input.repository
+            .subscribeCharacters(paginator: paginator)
             .subscribe(onNext: { [weak self] result in
-                Log.debug("Actualiza")
-                self?.output.datasource.onNext(result)
+                guard let weakSelf = self else {return}
+                Log.debug("Updated database")
+                weakSelf.appendCharacters(result)
             }, onError: { [weak self] error in
                 Log.debug(error.localizedDescription)
                 self?.output.state.onNext(.error(error))
             }).disposed(by: disposeBag)
+    }
+    
+    // MARK: - Paginator
+    
+    func loadNextPage() {
+        /// Load next page
+        output.state.onNext(.nextPage)
+        paginator.nextPage()
+                
+        input.repository
+            .fetchCharacters(paginator: paginator)
+            .subscribe(on: appSchedulers.background)
+            .observe(on: appSchedulers.main)
+            .flatMap({ response -> Observable<[Character]> in
+                guard let characters = response.data?.results else {
+                    return .just([])
+                }
+                return .just(characters.compactMap{$0})
+            })
+            .subscribe(onNext: { [weak self] result in
+                self?.appendCharacters(result)
+            }, onError: { [weak self] error in
+                Log.debug(error.localizedDescription)
+                self?.output.state.onNext(.error(error))
+            }).disposed(by: disposeBag)
+    }
+}
+
+// MARK: - Generate Data Source
+
+extension CharactersListViewModel {
+    func appendCharacters(_ newCharacters: [Character]) {
+        
+        /// Check and update new elements avoiding duplicates
+        var elements: [Character] = []
+        newCharacters.forEach { newCharacter in
+            if let row = characters.firstIndex(where: {$0.id == newCharacter.id}) {
+                   characters[row] = newCharacter
+            } else {
+                elements.append(newCharacter)
+            }
+        }
+        characters.append(contentsOf: elements)
+        
+        /// Generate components
+        var components : [CharacterComponentViewModel] = []
+        elements.forEach { character in
+            
+            let component = CharacterComponentViewModel.init(
+                character: character
+            )
+            components.append(component)
+        }
+        dataSource[0].items.append(contentsOf: components)
+        
+        output.dataSource.accept(dataSource)
+        output.state.onNext(.loaded)
     }
 }

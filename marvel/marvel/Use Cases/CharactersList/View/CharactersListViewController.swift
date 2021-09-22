@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import RxDataSources
 
 class CharactersListViewController: UIViewController {
     
@@ -16,7 +17,7 @@ class CharactersListViewController: UIViewController {
     
     // MARK: Public vars
     var viewModel: CharactersListViewModelProtocol?
-    var components: [CharacterComponentViewModel]?
+    var dataSource: RxTableViewSectionedAnimatedDataSource<ComponentsDataSource>?
         
     // MARK: Private RX vars
     private let disposeBag = DisposeBag()
@@ -32,12 +33,13 @@ class CharactersListViewController: UIViewController {
     
     private func setupView() {
         setupTableView()
-        view.backgroundColor = .red
+        setupPager()
     }
     
     // MARK: - Table View
     
     private func setupTableView() {
+        
         tableView.register(UINib(
             nibName: CharacterComponentViewModel
                 .Constants
@@ -47,17 +49,23 @@ class CharactersListViewController: UIViewController {
                 .Constants
                 .cellIdentifier
         )
+        
         /// Background color
         tableView.separatorColor = .clear
         tableView.backgroundColor = .systemGroupedBackground
-        /// Bind datasource
-        bindTableView()
+        
+        /// DataSource
+        setupDataSource()
+        bindData()
     }
     
-    private func bindTableView() {
-        viewModel?.output.datasource
-            .bind(to: tableView.rx.items) { tableView, _, component in
-                
+    private func setupDataSource() {
+        dataSource = RxTableViewSectionedAnimatedDataSource<ComponentsDataSource>(
+        animationConfiguration: AnimationConfiguration(
+            insertAnimation: .none,
+            reloadAnimation: .none,
+            deleteAnimation: .none
+        ),configureCell: { dataSource, tableView, indexPath, component in
             guard let cell = tableView.dequeueReusableCell(
                     withIdentifier: CharacterComponentViewModel
                         .Constants
@@ -67,7 +75,33 @@ class CharactersListViewController: UIViewController {
             }
             cell.setup(component: component)
             return cell
-        }.disposed(by: disposeBag)
+        })
+    }
+    
+    private func bindData() {
+        guard let dataSource = dataSource else { return }
+        tableView.dataSource = nil
+
+        viewModel?.output.dataSource.asDriver(onErrorJustReturn: [])
+            .map { $0 }
+            .drive(tableView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+    }
+    
+    private func setupPager() {
+        let loadNextPage = tableView
+            .rx
+            .reachedBottom()
+            .skip(1)
+
+        loadNextPage
+            .asObservable()
+            .throttle(.milliseconds(500),
+                      latest: false,
+                      scheduler: MainScheduler.instance)
+            .subscribe(onNext: { _ in
+                self.viewModel?.loadNextPage()
+            }).disposed(by: disposeBag)
     }
     
     // MARK: - Setup ViewModel
@@ -80,8 +114,11 @@ class CharactersListViewController: UIViewController {
                 switch state {
                 case .loading:
                     Log.debug("State Loading")
+                case .nextPage:
+                    self?.tableView.addLoading() {}
                 case .loaded:
                     Log.debug("State Loaded")
+                    self?.tableView.stopLoading()
                 case .error(let error):
                     Log.debug("State " + error.localizedDescription)
                 }
