@@ -45,12 +45,14 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
     // MARK: - Private vars
     private let disposeBag: DisposeBag
     private let appSchedulers: AppSchedulers
-    private var paginator: MarvelPaginator
+    private var paginator: MarvelPager
     private var characters: [Character]
     private var dataSource: [ComponentsDataSource]
     
     // MARK: - Init
-    init(repository: MarvelRepositoryProtocol) {
+    init(repository: MarvelRepositoryProtocol,
+         schedulers: AppSchedulers = MarvelAppSchedulers()) {
+        
         self.input = Input.init(
             repository: repository
         )
@@ -58,7 +60,7 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
             state: PublishSubject<CharactersListState>(),
             dataSource: BehaviorRelay<[ComponentsDataSource]>(value: [])
         )
-        self.paginator = MarvelPaginator.init(
+        self.paginator = MarvelPager.init(
             offset: 0,
             limit: 20
         )
@@ -68,7 +70,7 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
                             header: "",
                             items: [])]
         self.disposeBag = DisposeBag()
-        self.appSchedulers = MarvelAppSchedulers()
+        self.appSchedulers = schedulers
     }
     
     // MARK: - Load content
@@ -80,9 +82,7 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
         input.repository
             .subscribeCharacters(paginator: paginator)
             .subscribe(onNext: { [weak self] result in
-                guard let weakSelf = self else {return}
-                Log.debug("Updated database")
-                weakSelf.appendCharacters(result)
+                self?.appendCharacters(result)
             }, onError: { [weak self] error in
                 Log.debug(error.localizedDescription)
                 self?.output.state.onNext(.error(error))

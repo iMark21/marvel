@@ -26,7 +26,13 @@ extension Coordinator {
 }
 
 class BaseCoordinator: Coordinator {
-    var childCoordinators: [Coordinator] = []
+    var childCoordinators: [Coordinator]
+    let scheduler: ImmediateSchedulerType
+    
+    init(childCoordinators: [Coordinator] = [], scheduler: ImmediateSchedulerType = MainScheduler.instance) {
+        self.childCoordinators = childCoordinators
+        self.scheduler = scheduler
+    }
 
     func start() -> Observable<Void> {
         fatalError("Start method should be implemented in inherited class.")
@@ -38,6 +44,7 @@ class BaseCoordinator: Coordinator {
 
         return coordinator
             .start()
+            .observe(on: scheduler)
             .do(onNext: { [weak self, weak coordinator] _ in
                 Log.debug("Bye coordinator: \(String(describing: coordinator))")
                 self?.free(coordinator: coordinator)
