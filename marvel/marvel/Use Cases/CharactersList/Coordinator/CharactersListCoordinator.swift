@@ -29,13 +29,15 @@ class CharactersListCoordinator: BaseCoordinator {
     private let disposeBag: DisposeBag
     
     init(router: Router,
-         repository: MarvelRepositoryProtocol = MarvelRepository()) {
-        
+         repository: MarvelRepositoryProtocol = MarvelRepository(),
+         scheduler: AppSchedulers = MarvelAppSchedulers()) {
+                
         self.input = Input.init(
             router: router,
             repository: repository
         )
         self.disposeBag = DisposeBag()
+        super.init(scheduler: scheduler.main)
     }
     
     override func start() -> Observable<Void> {

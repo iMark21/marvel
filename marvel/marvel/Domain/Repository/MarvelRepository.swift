@@ -15,11 +15,11 @@ protocol MarvelRepositoryProtocol {
     var databaseClient: DatabaseProtocol { get }
     
     /// Characters
-    func fetchCharacters(paginator: MarvelPaginator) -> Observable<CharactersListResponse>
-    func subscribeCharacters(paginator: MarvelPaginator) -> Observable<[Character]>
+    func fetchCharacters(paginator: MarvelPager) -> Observable<CharactersListResponse>
+    func subscribeCharacters(paginator: MarvelPager) -> Observable<[Character]>
 }
 
-struct MarvelPaginator {
+struct MarvelPager {
     var offset: Int
     let limit: Int
     
@@ -48,7 +48,7 @@ class MarvelRepository: MarvelRepositoryProtocol {
     
     // MARK: - Characters
     
-    func fetchCharacters(paginator: MarvelPaginator) -> Observable<CharactersListResponse> {
+    func fetchCharacters(paginator: MarvelPager) -> Observable<CharactersListResponse> {
         let request = CharactersRequest.init(
             offset: paginator.offset,
             limit: paginator.limit
@@ -56,7 +56,7 @@ class MarvelRepository: MarvelRepositoryProtocol {
         return fetchNetworkRequest(request: request)
     }
     
-    func subscribeCharacters<T: Codable & Object>(paginator: MarvelPaginator) -> Observable<[T]> {
+    func subscribeCharacters<T: Codable & Object>(paginator: MarvelPager) -> Observable<[T]> {
         
         fetchCharacters(paginator: paginator)
             .map { response in

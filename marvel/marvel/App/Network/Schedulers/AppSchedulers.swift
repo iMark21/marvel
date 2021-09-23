@@ -14,6 +14,13 @@ public protocol AppSchedulers {
 }
 
 class MarvelAppSchedulers: AppSchedulers {
-    public let main: ImmediateSchedulerType = MainScheduler.instance
-    public let background: ImmediateSchedulerType = ConcurrentDispatchQueueScheduler(qos: .background)
+    public let main: ImmediateSchedulerType
+    public let background: ImmediateSchedulerType
+    
+    init(main: ImmediateSchedulerType = MainScheduler.instance,
+         background: ImmediateSchedulerType = ConcurrentDispatchQueueScheduler(qos: .background)) {
+        
+        self.main = main
+        self.background = background
+    }
 }
