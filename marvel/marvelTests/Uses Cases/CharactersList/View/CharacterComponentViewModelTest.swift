@@ -6,23 +6,42 @@
 //
 
 import XCTest
+import RxTest
 
 @testable import marvel
 
 class CharacterComponentViewModelTest: XCTestCase {
     
-    var componentViewModel: CharacterComponentProtocol!
-    var character: Character!
+    private var scheduler: TestScheduler!
+    private var componentViewModel: CharacterComponentProtocol!
+    private var character: Character!
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
-        self.character = MarvelRepositoryMock().generateCharacters().first!
+        
+        self.scheduler = TestScheduler(initialClock: 0)
+
+        /// Schedulers
+        let schedulers = MarvelAppSchedulers.init(
+            main: scheduler,
+            background: scheduler
+        )
+        
+        self.character = MarvelRepositoryMock(
+            appSchedulers: schedulers
+        )
+            .generateCharacters().first!
         self.componentViewModel = CharacterComponentViewModel.init(character: character)
+        
+        try super.setUpWithError()
     }
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         self.componentViewModel = nil
+        self.scheduler = nil
+        
+        try super.tearDownWithError()
     }
 
     func testInit(){

@@ -24,8 +24,13 @@ class AppCoordinator: BaseCoordinator {
         let navigationController = UINavigationController()
 
         let router = Router(navigationController: navigationController)
+        let schedulers = MarvelAppSchedulers()
+        let repository = MarvelRepository.init(appSchedulers: schedulers)
+        
         let coordinator = CharactersListCoordinator(
-            router: router
+            router: router,
+            repository: repository,
+            scheduler: schedulers
         )
 
         window?.rootViewController = navigationController

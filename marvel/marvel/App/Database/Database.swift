@@ -13,6 +13,7 @@ import RxSwift
 
 protocol DatabaseProtocol {
     func save<T: Object & Codable>(objects: [T?]?)
+    func get<T: Object & Codable>(type: T.Type) -> Observable<[T]>
     func observe<T: Object>(type: T.Type) -> Observable<[T]>
 }
 
@@ -26,6 +27,28 @@ class Database: DatabaseProtocol {
         self.appSchedulers = MarvelAppSchedulers()
     }
     
+    func get<T: Object>(type: T.Type) -> Observable<[T]> {
+        do {
+            let realm = try Realm()
+            let objs = realm.objects(type).toArray()
+            return .just(objs)
+        } catch _ {
+            return .just([])
+        }
+    }
+    
+    func save<T: Object>(objects: [T?]?) {
+        if let realm = try? Realm(),
+           let objects = objects {
+
+            let result = objects.compactMap { $0 }
+
+            Observable.from(result)
+                .subscribe(realm.rx.add(update: .modified))
+                .disposed(by: disposeBag)
+        }
+    }
+    
     func observe<T: Object>(type: T.Type) -> Observable<[T]> {
         let realm = try! Realm()
         let result = realm.objects(type.self)
@@ -33,7 +56,6 @@ class Database: DatabaseProtocol {
         Log.debug("Object \(T.self) (\(result.count) count) list is available")
         
         return Observable.changeset(from: result)
-            .debug("Observable!!")
             .flatMap({ results, changes -> Observable<[T]> in
                 if let changes = changes {
                     // it's an update
@@ -47,17 +69,5 @@ class Database: DatabaseProtocol {
                 
                 return .just(results.toArray())
             })
-    }
-    
-    func save<T: Object>(objects: [T?]?) {
-        if let realm = try? Realm(),
-           let objects = objects {
-
-            let result = objects.compactMap { $0 }
-
-            Observable.from(result)
-                .subscribe(realm.rx.add(update: .modified))
-                .disposed(by: disposeBag)
-        }
     }
 }

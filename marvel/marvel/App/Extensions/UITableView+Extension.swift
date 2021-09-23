@@ -8,6 +8,8 @@
 import RxSwift
 import RxCocoa
 
+// MARK: - UITableView Extensions
+
 extension UITableView {
     
     func indicatorView() -> UIActivityIndicatorView {
@@ -40,6 +42,8 @@ extension UITableView {
         self.tableFooterView = nil
     }
 }
+
+// MARK: - UITableView Rx Extensions
 
 extension Reactive where Base: UITableView {
 

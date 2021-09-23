@@ -25,13 +25,14 @@ class CharactersListViewModelTests: XCTestCase {
         /// Variables
         self.scheduler = TestScheduler(initialClock: 0)
         self.disposeBag = DisposeBag()
-        self.repository = MarvelRepositoryMock()
         
         /// Schedulers
         let schedulers = MarvelAppSchedulers.init(
             main: scheduler,
             background: scheduler
         )
+        self.repository = MarvelRepositoryMock(appSchedulers: schedulers)
+
         
         /// View Model
         self.viewModel = CharactersListViewModel.init(
