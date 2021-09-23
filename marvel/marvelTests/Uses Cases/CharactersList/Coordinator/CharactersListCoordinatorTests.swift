@@ -14,6 +14,8 @@ import RxSwift
 class CharactersListCoordinatorTests: XCTestCase {
     
     private var scheduler: TestScheduler!
+    private var appSchedulers: AppSchedulers!
+    private var repository: MarvelRepositoryProtocol!
     private var disposeBag: DisposeBag!
     private var navigationController: UINavigationControllerMock!
     private var router: Router!
@@ -30,15 +32,20 @@ class CharactersListCoordinatorTests: XCTestCase {
         self.router = Router(navigationController: navigationController)
         
         /// Schedulers
-        let schedulers = MarvelAppSchedulers.init(
+        self.appSchedulers = MarvelAppSchedulers.init(
             main: scheduler,
             background: scheduler
         )
         
+        /// Repository
+        self.repository = MarvelRepositoryMock
+            .init(appSchedulers: appSchedulers)
+        
         /// Coordinator
         self.coordinator = CharactersListCoordinator.init(
             router: router,
-            scheduler: schedulers
+            repository: repository,
+            scheduler: appSchedulers
         )
     }
 
@@ -51,6 +58,8 @@ class CharactersListCoordinatorTests: XCTestCase {
         self.navigationController = nil
         self.router = nil
         self.coordinator = nil
+        self.repository = nil
+        self.appSchedulers = nil
     }
 
     func testStart() {
@@ -58,7 +67,6 @@ class CharactersListCoordinatorTests: XCTestCase {
         let start = scheduler.createObserver(Void.self)
         
         /// When
-        let coordinator = CharactersListCoordinator.init(router: router)
         coordinator.start()
             .bind(to: start)
             .disposed(by: disposeBag)

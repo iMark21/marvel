@@ -21,6 +21,7 @@ class CharactersListViewController: UIViewController {
         
     // MARK: Private RX vars
     private let disposeBag = DisposeBag()
+    private let appSchedulers = MarvelAppSchedulers()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,11 +62,7 @@ class CharactersListViewController: UIViewController {
     
     private func setupDataSource() {
         dataSource = RxTableViewSectionedAnimatedDataSource<ComponentsDataSource>(
-        animationConfiguration: AnimationConfiguration(
-            insertAnimation: .none,
-            reloadAnimation: .none,
-            deleteAnimation: .none
-        ),configureCell: { dataSource, tableView, indexPath, component in
+        configureCell: { dataSource, tableView, indexPath, component in
             guard let cell = tableView.dequeueReusableCell(
                     withIdentifier: CharacterComponentViewModel
                         .Constants
@@ -76,13 +73,17 @@ class CharactersListViewController: UIViewController {
             cell.setup(component: component)
             return cell
         })
+        
+        dataSource?.decideViewTransition = { (_, _, _)  in return RxDataSources.ViewTransition.reload }
+
     }
     
     private func bindData() {
         guard let dataSource = dataSource else { return }
         tableView.dataSource = nil
 
-        viewModel?.output.dataSource.asDriver(onErrorJustReturn: [])
+        viewModel?.output.dataSource
+            .asDriver(onErrorJustReturn: [])
             .map { $0 }
             .drive(tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
@@ -99,8 +100,12 @@ class CharactersListViewController: UIViewController {
             .throttle(.milliseconds(500),
                       latest: false,
                       scheduler: MainScheduler.instance)
-            .subscribe(onNext: { _ in
-                self.viewModel?.loadNextPage()
+            .subscribe(onNext: { [weak self] _ in
+                if self?.tableView
+                    .visibleCells
+                    .isEmpty == false {
+                    self?.viewModel?.loadNextPage()
+                }
             }).disposed(by: disposeBag)
     }
     

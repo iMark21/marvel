@@ -78,15 +78,7 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
     func setup() {
         /// Loading
         output.state.onNext(.loading)
-        
-        input.repository
-            .subscribeCharacters(paginator: paginator)
-            .subscribe(onNext: { [weak self] result in
-                self?.appendCharacters(result)
-            }, onError: { [weak self] error in
-                Log.debug(error.localizedDescription)
-                self?.output.state.onNext(.error(error))
-            }).disposed(by: disposeBag)
+        fetchContent()
     }
     
     // MARK: - Paginator
@@ -95,17 +87,15 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
         /// Load next page
         output.state.onNext(.nextPage)
         paginator.nextPage()
-                
+        /// Request
+        fetchContent()
+    }
+    
+    private func fetchContent(){
         input.repository
             .fetchCharacters(paginator: paginator)
             .subscribe(on: appSchedulers.background)
             .observe(on: appSchedulers.main)
-            .flatMap({ response -> Observable<[Character]> in
-                guard let characters = response.data?.results else {
-                    return .just([])
-                }
-                return .just(characters.compactMap{$0})
-            })
             .subscribe(onNext: { [weak self] result in
                 self?.appendCharacters(result)
             }, onError: { [weak self] error in
@@ -119,27 +109,22 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
 
 extension CharactersListViewModel {
     func appendCharacters(_ newCharacters: [Character]) {
-        
+
         /// Check and update new elements avoiding duplicates
-        var elements: [Character] = []
-        newCharacters.forEach { newCharacter in
-            if let row = characters.firstIndex(where: {$0.id == newCharacter.id}) {
-                   characters[row] = newCharacter
-            } else {
-                elements.append(newCharacter)
-            }
+        if paginator.isFirstPage {
+            dataSource[0].items = []
         }
-        characters.append(contentsOf: elements)
         
         /// Generate components
         var components : [CharacterComponentViewModel] = []
-        elements.forEach { character in
+        newCharacters.forEach { character in
             
             let component = CharacterComponentViewModel.init(
                 character: character
             )
             components.append(component)
         }
+        
         dataSource[0].items.append(contentsOf: components)
         
         output.dataSource.accept(dataSource)

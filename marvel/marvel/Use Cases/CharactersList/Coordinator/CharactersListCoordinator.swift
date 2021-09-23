@@ -29,8 +29,8 @@ class CharactersListCoordinator: BaseCoordinator {
     private let disposeBag: DisposeBag
     
     init(router: Router,
-         repository: MarvelRepositoryProtocol = MarvelRepository(),
-         scheduler: AppSchedulers = MarvelAppSchedulers()) {
+         repository: MarvelRepositoryProtocol,
+         scheduler: AppSchedulers) {
                 
         self.input = Input.init(
             router: router,

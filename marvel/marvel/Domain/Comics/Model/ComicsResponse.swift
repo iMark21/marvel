@@ -1,8 +1,8 @@
 //
-//  CharactersResponse.swift
+//  ComicsResponse.swift
 //  marvel
 //
-//  Created by Michel Marques on 20/9/21.
+//  Created by Michel Marques on 23/9/21.
 //
 
 import Foundation
@@ -10,13 +10,13 @@ import Realm
 import RealmSwift
 
 // MARK: - List Response
-struct CharactersListResponse: Codable {
+struct ComicsListResponse: Codable {
     let code: Int?
-    let data: CharactersResponse?
+    let data: ComicsResponse?
 }
 
-// MARK: - Characters Response
-struct CharactersResponse: Codable {
+// MARK: - Comics Response
+struct ComicsResponse: Codable {
     let results: [Character?]?
     let offset: Int?
     let count: Int?
@@ -24,8 +24,8 @@ struct CharactersResponse: Codable {
     let limit: Int?
 }
 
-// MARK: - Character
-class Character: Object, Codable {
+// MARK: - Comic
+class Comic: Object, Codable {
     @objc dynamic var id: Int
     @objc dynamic var name: String?
     @objc dynamic var desc: String?
@@ -36,7 +36,7 @@ class Character: Object, Codable {
     }
 }
 
-extension Character {
+extension Comic {
     enum CodingKeys: String, CodingKey {
         case id = "id"
         case name = "name"
@@ -44,18 +44,3 @@ extension Character {
         case desc = "description"
     }
 }
-
-// MARK: - Thumbnail
-class Thumbnail: Object, Codable {
-    @objc dynamic var url: String?
-    @objc dynamic var mimeType: String?
-}
-
-extension Thumbnail {
-    enum CodingKeys: String, CodingKey {
-        case url = "path"
-        case mimeType = "extension"
-    }
-}
-
-

@@ -14,26 +14,14 @@ import Realm
 
 class MarvelRepositoryMock: MarvelRepository {
     
-    override func fetchCharacters(paginator: MarvelPager) -> Observable<CharactersListResponse> {
-        
-        do {
-            let model: CharactersListResponse = try JSONDecoder()
-                .decode(CharactersListResponse.self,
-                        from: returnContentsOfJsonFile(named: "characters") ??
-                            Data())            
-            return .just(model)
-        } catch {
-            fatalError()
-        }
-    }
-    
-    override func subscribeCharacters<T: Codable & Object>(paginator: MarvelPager) -> Observable<[T]> {
+    override func fetchCharacters<T: Codable & Object>(paginator: MarvelPager) -> Observable<[T]>  {
         if let characters = generateCharacters() as? [T] {
             return .just(characters)
         }
         return .just([])
     }
-    
+
+
     // MARK: - Private methods
     
     func generateCharacters() -> [Character] {
