@@ -15,6 +15,7 @@ extension CharactersListCoordinator {
     struct Input {
         let router: Router
         let repository: MarvelRepositoryProtocol
+        let schedulers: AppSchedulers
     }
 }
 
@@ -30,14 +31,15 @@ class CharactersListCoordinator: BaseCoordinator {
     
     init(router: Router,
          repository: MarvelRepositoryProtocol,
-         scheduler: AppSchedulers) {
+         schedulers: AppSchedulers) {
                 
         self.input = Input.init(
             router: router,
-            repository: repository
+            repository: repository,
+            schedulers: schedulers
         )
         self.disposeBag = DisposeBag()
-        super.init(scheduler: scheduler.main)
+        super.init(scheduler: schedulers.main)
     }
     
     override func start() -> Observable<Void> {
@@ -47,13 +49,38 @@ class CharactersListCoordinator: BaseCoordinator {
         }
         
         let viewModel = CharactersListViewModel.init(
-            repository: input.repository
+            repository: input.repository,
+            schedulers: input.schedulers
         )
+        
+        viewModel.output.action
+            .subscribe(onNext: { action in
+                switch action {
+                case .openDetail(let component):
+                    self.openDetail(component: component)
+                        .subscribe()
+                        .disposed(by: self.disposeBag)
+                }
+            }).disposed(by: disposeBag)
+        
         viewController.viewModel = viewModel
         
         return input.router.rx.push(
             viewController,
             isAnimated: true
         )
+    }
+}
+
+// MARK: - Navigation
+
+extension CharactersListCoordinator {
+    func openDetail(component: CharacterComponentProtocol) -> Observable<Void> {
+        let coordinator = CharacterDetailCoordinator.init(
+            router: input.router,
+            repository: input.repository,
+            component: component,
+            schedulers: input.schedulers)
+        return coordinate(coordinator)
     }
 }

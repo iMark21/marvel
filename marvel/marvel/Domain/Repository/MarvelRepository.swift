@@ -18,7 +18,7 @@ protocol MarvelRepositoryProtocol {
     func fetchCharacters(paginator: MarvelPager) -> Observable<[Character]>
     
     /// Comics
-    func fetchComics(characterId: String) -> Observable<[Comic]>
+    func fetchComics(characterId: Int) -> Observable<[Comic]>
 }
 
 struct MarvelPager {
@@ -93,7 +93,7 @@ class MarvelRepository: MarvelRepositoryProtocol {
     
     // MARK: - Comics
     
-    func fetchComics(characterId: String) -> Observable<[Comic]> {
+    func fetchComics(characterId: Int) -> Observable<[Comic]> {
         let request = ComicsRequest.init(characterId: characterId)
         return fetchNetworkRequest(request: request)
     }

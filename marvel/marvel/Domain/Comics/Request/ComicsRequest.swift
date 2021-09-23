@@ -14,7 +14,7 @@ final class ComicsRequest: APIRequest {
     var path: String
     var parameters: [String : String]
 
-    init(characterId: String) {
+    init(characterId: Int) {
         self.method = .GET
         self.path = "\(APIConstants.Path.characters)" +
             "/\(characterId)" +

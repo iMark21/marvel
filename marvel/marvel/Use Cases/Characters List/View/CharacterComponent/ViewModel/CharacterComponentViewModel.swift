@@ -22,7 +22,8 @@ extension CharacterComponentViewModel {
     
     struct Output {
         let imageUrl: URL?
-        let name: String
+        let name: String?
+        let description: String?
     }
     
     struct Constants {
@@ -49,7 +50,8 @@ class CharacterComponentViewModel: CharacterComponentProtocol {
                         (character.thumbnail?.mimeType ?? "")
                 )
             ),
-            name: character.name ?? "-"
+            name: character.name,
+            description: character.desc
         )
     }
 }
