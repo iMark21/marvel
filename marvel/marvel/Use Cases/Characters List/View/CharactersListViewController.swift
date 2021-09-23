@@ -51,6 +51,28 @@ class CharactersListViewController: UIViewController {
                 .cellIdentifier
         )
         
+        ///Row selected
+        tableView
+            .rx
+            .itemSelected
+            .subscribe(onNext: { [weak self] indexPath in
+                self?.tableView.deselectRow(
+                    at: indexPath,
+                    animated: true
+                )
+            }).disposed(by: disposeBag)
+        
+        ///Item selected
+        tableView
+            .rx
+            .modelSelected(CharacterComponentProtocol.self)
+            .subscribe(onNext: { [weak self] component in
+                self?.viewModel?
+                    .output
+                    .action
+                    .onNext(.openDetail(component))
+            }).disposed(by: disposeBag)
+        
         /// Background color
         tableView.separatorColor = .clear
         tableView.backgroundColor = .systemGroupedBackground

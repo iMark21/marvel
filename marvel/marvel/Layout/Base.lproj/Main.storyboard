@@ -39,6 +39,21 @@
             </objects>
             <point key="canvasLocation" x="139" y="49"/>
         </scene>
+        <!--Character Detail View Controller-->
+        <scene sceneID="Sso-Ge-2zO">
+            <objects>
+                <viewController storyboardIdentifier="CharacterDetailViewController" id="DE8-KW-7SR" customClass="CharacterDetailViewController" customModule="marvel" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="i96-SF-ZhF">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="wfu-rx-08r"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="fmo-3B-mFc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="913" y="60"/>
+        </scene>
         <!--Splash View Controller-->
         <scene sceneID="cvC-BW-sns">
             <objects>

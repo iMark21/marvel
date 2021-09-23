@@ -30,7 +30,7 @@ class AppCoordinator: BaseCoordinator {
         let coordinator = CharactersListCoordinator(
             router: router,
             repository: repository,
-            scheduler: schedulers
+            schedulers: schedulers
         )
 
         window?.rootViewController = navigationController

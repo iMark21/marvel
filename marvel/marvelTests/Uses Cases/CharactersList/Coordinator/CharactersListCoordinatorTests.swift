@@ -45,7 +45,7 @@ class CharactersListCoordinatorTests: XCTestCase {
         self.coordinator = CharactersListCoordinator.init(
             router: router,
             repository: repository,
-            scheduler: appSchedulers
+            schedulers: appSchedulers
         )
     }
 

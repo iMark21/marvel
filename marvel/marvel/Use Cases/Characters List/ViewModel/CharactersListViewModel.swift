@@ -26,11 +26,13 @@ extension CharactersListViewModel {
 
     struct Input {
         let repository: MarvelRepositoryProtocol
+        let appSchedulers: AppSchedulers
     }
     
     struct Output {
-        let state: PublishSubject<CharactersListState>
+        let action: PublishSubject<CharactersListAction>
         let dataSource: BehaviorRelay<[ComponentsDataSource]>
+        let state: PublishSubject<CharactersListState>
     }
 }
 
@@ -44,21 +46,22 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
     
     // MARK: - Private vars
     private let disposeBag: DisposeBag
-    private let appSchedulers: AppSchedulers
     private var paginator: MarvelPager
     private var characters: [Character]
     private var dataSource: [ComponentsDataSource]
     
     // MARK: - Init
     init(repository: MarvelRepositoryProtocol,
-         schedulers: AppSchedulers = MarvelAppSchedulers()) {
+         schedulers: AppSchedulers) {
         
         self.input = Input.init(
-            repository: repository
+            repository: repository,
+            appSchedulers: schedulers
         )
         self.output = Output.init(
-            state: PublishSubject<CharactersListState>(),
-            dataSource: BehaviorRelay<[ComponentsDataSource]>(value: [])
+            action: PublishSubject<CharactersListAction>(),
+            dataSource: BehaviorRelay<[ComponentsDataSource]>(value: []),
+            state: PublishSubject<CharactersListState>()
         )
         self.paginator = MarvelPager.init(
             offset: 0,
@@ -70,7 +73,6 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
                             header: "",
                             items: [])]
         self.disposeBag = DisposeBag()
-        self.appSchedulers = schedulers
     }
     
     // MARK: - Load content
@@ -81,6 +83,19 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
         fetchContent()
     }
     
+    private func fetchContent(){
+        input.repository
+            .fetchCharacters(paginator: paginator)
+            .subscribe(on: input.appSchedulers.background)
+            .observe(on: input.appSchedulers.main)
+            .subscribe(onNext: { [weak self] result in
+                self?.appendCharacters(result)
+            }, onError: { [weak self] error in
+                Log.debug(error.localizedDescription)
+                self?.output.state.onNext(.error(error))
+            }).disposed(by: disposeBag)
+    }
+    
     // MARK: - Paginator
     
     func loadNextPage() {
@@ -89,19 +104,6 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
         paginator.nextPage()
         /// Request
         fetchContent()
-    }
-    
-    private func fetchContent(){
-        input.repository
-            .fetchCharacters(paginator: paginator)
-            .subscribe(on: appSchedulers.background)
-            .observe(on: appSchedulers.main)
-            .subscribe(onNext: { [weak self] result in
-                self?.appendCharacters(result)
-            }, onError: { [weak self] error in
-                Log.debug(error.localizedDescription)
-                self?.output.state.onNext(.error(error))
-            }).disposed(by: disposeBag)
     }
 }
 
