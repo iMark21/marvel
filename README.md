@@ -17,6 +17,12 @@ Diagram:
 - Using [Repository Pattern](https://medium.com/tiendeo-tech/ios-repository-pattern-in-swift-85a8c62bf436) to manage requests and responses
 - Implemented [Unit Test](https://geekytheory.com/la-importancia-de-ui-testing-y-unit-testing)
 
+### Available Actions 
+Run tests in Terminal
+```
+fastlane tests
+```
+
 ### Application Structure
 
 - APP
