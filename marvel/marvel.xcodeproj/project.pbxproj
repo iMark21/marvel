@@ -253,7 +253,6 @@
 				B39CD41426F8F1110029A8C8 /* Characters */,
 				B3F8300526FDDA3400A6A56D /* Media */,
 				B39CD41526F8F1200029A8C8 /* Repository */,
-				B3F8300226FDD3E700A6A56D /* Thumbnail */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -870,6 +869,7 @@
 		B3F8300526FDDA3400A6A56D /* Media */ = {
 			isa = PBXGroup;
 			children = (
+				B3F8300226FDD3E700A6A56D /* Thumbnail */,
 				B3F82FF226FDC03E00A6A56D /* Series */,
 				B3F82FB826FC875D00A6A56D /* Comics */,
 			);
