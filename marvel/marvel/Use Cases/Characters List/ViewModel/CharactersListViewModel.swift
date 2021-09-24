@@ -47,7 +47,6 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
     // MARK: - Private vars
     private let disposeBag: DisposeBag
     private var paginator: MarvelPager
-    private var characters: [Character]
     private var dataSource: [ComponentsDataSource]
     
     // MARK: - Init
@@ -67,16 +66,16 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
             offset: 0,
             limit: 20
         )
-        self.characters = []
-        self.dataSource = [ComponentsDataSource.init(
-                            uniqueId: UUID().uuidString,
-                            header: "",
-                            items: [])]
+        self.dataSource = [
+            ComponentsDataSource.init(
+                uniqueId: UUID().uuidString,
+                header: "",
+                items: [])
+        ]
         self.disposeBag = DisposeBag()
     }
     
     // MARK: - Load content
-    
     func setup() {
         /// Loading
         output.state.onNext(.loading)
@@ -97,7 +96,6 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
     }
     
     // MARK: - Paginator
-    
     func loadNextPage() {
         /// Load next page
         output.state.onNext(.nextPage)
@@ -128,7 +126,6 @@ extension CharactersListViewModel {
         }
         
         dataSource[0].items.append(contentsOf: components)
-        
         output.dataSource.accept(dataSource)
         output.state.onNext(.loaded)
     }
