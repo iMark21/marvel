@@ -88,3 +88,6 @@ fastlane/test_output
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
+marvel/fastlane/report.xml
+marvel/fastlane/test_output/report.html
+marvel/fastlane/test_output/report.junit
