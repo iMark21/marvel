@@ -19,13 +19,13 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tZk-sC-7cO">
-                        <rect key="frame" x="20" y="10" width="420" height="120"/>
+                        <rect key="frame" x="20" y="10" width="420" height="150"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="TLv-29-AiA">
-                                <rect key="frame" x="0.0" y="0.0" width="420" height="120"/>
+                                <rect key="frame" x="0.0" y="0.0" width="420" height="150"/>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Yi4-Vk-xwl">
-                                <rect key="frame" x="0.0" y="70" width="420" height="50"/>
+                                <rect key="frame" x="0.0" y="100" width="420" height="50"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ETT-9T-6sM">
                                         <rect key="frame" x="20" y="10" width="380" height="30"/>
@@ -50,7 +50,7 @@
                             <constraint firstItem="TLv-29-AiA" firstAttribute="leading" secondItem="tZk-sC-7cO" secondAttribute="leading" id="FKK-CM-pXp"/>
                             <constraint firstAttribute="trailing" secondItem="TLv-29-AiA" secondAttribute="trailing" id="HvB-B5-sLE"/>
                             <constraint firstItem="TLv-29-AiA" firstAttribute="top" secondItem="tZk-sC-7cO" secondAttribute="top" id="Pt3-eT-HYX"/>
-                            <constraint firstAttribute="height" constant="120" id="REB-m8-Um6"/>
+                            <constraint firstAttribute="height" constant="150" id="REB-m8-Um6"/>
                             <constraint firstItem="Yi4-Vk-xwl" firstAttribute="leading" secondItem="tZk-sC-7cO" secondAttribute="leading" id="Upo-F5-GtY"/>
                             <constraint firstAttribute="bottom" secondItem="TLv-29-AiA" secondAttribute="bottom" id="aHg-Zc-47S"/>
                             <constraint firstAttribute="bottom" secondItem="Yi4-Vk-xwl" secondAttribute="bottom" id="bRX-aN-0oh"/>
