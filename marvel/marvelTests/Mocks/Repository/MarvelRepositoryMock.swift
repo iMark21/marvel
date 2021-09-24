@@ -20,6 +20,20 @@ class MarvelRepositoryMock: MarvelRepository {
         }
         return .just(nil)
     }
+    
+    override func fetchComics<T>(characterId: Int) -> Observable<[T]> where T : Object, T : Decodable, T : Encodable {
+        if let comics = generateComics() as? [T] {
+            return .just(comics)
+        }
+        return .just([])
+    }
+    
+    override func fetchSeries<T>(characterId: Int) -> Observable<[T]> where T : Object, T : Decodable, T : Encodable {
+        if let series = generateSeries() as? [T] {
+            return .just(series)
+        }
+        return .just([])
+    }
 
 
     // MARK: - Private methods
@@ -38,6 +52,48 @@ class MarvelRepositoryMock: MarvelRepository {
             if let newData = try? JSONSerialization.data(withJSONObject: results, options: .prettyPrinted){
                 if let characters = try? JSONDecoder.init().decode([Character].self, from: newData) {
                     return characters
+                }
+            }
+        } catch { fatalError() }
+            
+        return []
+    }
+    
+    func generateComics() -> [Comic] {
+        do {
+            let json = try JSONSerialization
+                .jsonObject(
+                    with: returnContentsOfJsonFile(named: "comics") ?? Data(),
+                    options: []) as? [String : Any]
+            
+            guard let comicsData = json?["data"] as? [String: Any],
+                let results = comicsData["results"] as? [Any] else {
+                    return []
+            }
+            if let newData = try? JSONSerialization.data(withJSONObject: results, options: .prettyPrinted){
+                if let comics = try? JSONDecoder.init().decode([Comic].self, from: newData) {
+                    return comics
+                }
+            }
+        } catch { fatalError() }
+            
+        return []
+    }
+    
+    func generateSeries() -> [Serie] {
+        do {
+            let json = try JSONSerialization
+                .jsonObject(
+                    with: returnContentsOfJsonFile(named: "comics") ?? Data(),
+                    options: []) as? [String : Any]
+            
+            guard let seriesData = json?["data"] as? [String: Any],
+                let results = seriesData["results"] as? [Any] else {
+                    return []
+            }
+            if let newData = try? JSONSerialization.data(withJSONObject: results, options: .prettyPrinted){
+                if let series = try? JSONDecoder.init().decode([Serie].self, from: newData) {
+                    return series
                 }
             }
         } catch { fatalError() }
