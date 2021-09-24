@@ -16,7 +16,7 @@ class MediaComponentViewModelTests: XCTestCase {
     private var disposeBag: DisposeBag!
     private var scheduler: TestScheduler!
     private var viewModel: MediaComponentProtocol!
-    private var comic: Any!
+    private var media: Any!
     
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -33,11 +33,11 @@ class MediaComponentViewModelTests: XCTestCase {
         )
         
         /// View Model
-        self.comic = MarvelRepositoryMock(
+        self.media = MarvelRepositoryMock(
             appSchedulers: schedulers
         )
         .generateComics().first
-        self.viewModel = MediaComponentViewModel.init(media: comic!)
+        self.viewModel = MediaComponentViewModel.init(media: media!)
     }
 
     override func tearDownWithError() throws {
@@ -46,7 +46,7 @@ class MediaComponentViewModelTests: XCTestCase {
         disposeBag = nil
         scheduler = nil
         viewModel = nil
-        comic = nil
+        media = nil
     }
 
     func testInit(){
@@ -54,19 +54,19 @@ class MediaComponentViewModelTests: XCTestCase {
     }
     
     func testIsComic() {
-        XCTAssert(comic! is Comic)
+        XCTAssert(media is Comic)
     }
     
     func testImageUrl() {
         XCTAssertEqual(
-            (comic as! Comic).thumbnail?.getImageUrl(),
+            (media as! Comic).thumbnail?.getImageUrl(),
             viewModel.output?.imageUrl
         )
     }
     
     func testName() {
         XCTAssertEqual(
-            (comic as! Comic).title!,
+            (media as! Comic).title,
             viewModel.output?.title
         )
     }

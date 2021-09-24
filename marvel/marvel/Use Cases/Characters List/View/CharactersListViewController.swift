@@ -32,6 +32,7 @@ class CharactersListViewController: UIViewController {
     // MARK: - Setup View
     
     private func setupView() {
+        self.title = "Super Heroes"
         setupTableView()
         setupPager()
     }
@@ -39,10 +40,10 @@ class CharactersListViewController: UIViewController {
     // MARK: - Table View
     
     private func setupTableView() {
-        
+        /// Register cell
         tableView.registerCell(type: CharacterComponent.self)
         
-        ///Row selected
+        /// Row selected
         tableView
             .rx
             .itemSelected
