@@ -46,9 +46,24 @@
                     <view key="view" contentMode="scaleToFill" id="i96-SF-ZhF">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="K2O-In-gtj">
+                                <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </tableView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="wfu-rx-08r"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="wfu-rx-08r" firstAttribute="trailing" secondItem="K2O-In-gtj" secondAttribute="trailing" id="LPX-Va-ljo"/>
+                            <constraint firstItem="K2O-In-gtj" firstAttribute="leading" secondItem="wfu-rx-08r" secondAttribute="leading" id="N5j-Py-Yan"/>
+                            <constraint firstItem="K2O-In-gtj" firstAttribute="top" secondItem="wfu-rx-08r" secondAttribute="top" id="Sgl-rH-NKB"/>
+                            <constraint firstItem="wfu-rx-08r" firstAttribute="bottom" secondItem="K2O-In-gtj" secondAttribute="bottom" id="yQB-KP-Vza"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="tableView" destination="K2O-In-gtj" id="keg-4N-EfF"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fmo-3B-mFc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

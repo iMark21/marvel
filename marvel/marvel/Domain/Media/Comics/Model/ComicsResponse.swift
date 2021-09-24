@@ -17,7 +17,7 @@ struct ComicsListResponse: Codable {
 
 // MARK: - Comics Response
 struct ComicsResponse: Codable {
-    let results: [Character?]?
+    let results: [Comic?]?
     let offset: Int?
     let count: Int?
     let total: Int?
@@ -27,7 +27,7 @@ struct ComicsResponse: Codable {
 // MARK: - Comic
 class Comic: Object, Codable {
     @objc dynamic var id: Int
-    @objc dynamic var name: String?
+    @objc dynamic var title: String?
     @objc dynamic var desc: String?
     @objc dynamic var thumbnail: Thumbnail?
 
@@ -39,7 +39,7 @@ class Comic: Object, Codable {
 extension Comic {
     enum CodingKeys: String, CodingKey {
         case id = "id"
-        case name = "name"
+        case title = "title"
         case thumbnail = "thumbnail"
         case desc = "description"
     }

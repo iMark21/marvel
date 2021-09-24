@@ -14,11 +14,11 @@ import Realm
 
 class MarvelRepositoryMock: MarvelRepository {
     
-    override func fetchCharacters<T: Codable & Object>(paginator: MarvelPager) -> Observable<[T]>  {
+    override func fetchCharacters<T: Codable & Object>(paginator: MarvelPager) -> Observable<[T]?>  {
         if let characters = generateCharacters() as? [T] {
             return .just(characters)
         }
-        return .just([])
+        return .just(nil)
     }
 
 
