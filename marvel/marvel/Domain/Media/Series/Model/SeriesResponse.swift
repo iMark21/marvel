@@ -1,8 +1,8 @@
 //
-//  CharactersResponse.swift
+//  SeriesResponse.swift
 //  marvel
 //
-//  Created by Michel Marques on 20/9/21.
+//  Created by Michel Marques on 24/9/21.
 //
 
 import Foundation
@@ -10,24 +10,24 @@ import Realm
 import RealmSwift
 
 // MARK: - List Response
-struct CharactersListResponse: Codable {
+struct SeriesListResponse: Codable {
     let code: Int?
-    let data: CharactersResponse?
+    let data: SeriesResponse?
 }
 
-// MARK: - Characters Response
-struct CharactersResponse: Codable {
-    let results: [Character?]?
+// MARK: - Series Response
+struct SeriesResponse: Codable {
+    let results: [Serie?]?
     let offset: Int?
     let count: Int?
     let total: Int?
     let limit: Int?
 }
 
-// MARK: - Character
-class Character: Object, Codable {
+// MARK: - Serie
+class Serie: Object, Codable {
     @objc dynamic var id: Int
-    @objc dynamic var name: String?
+    @objc dynamic var title: String?
     @objc dynamic var desc: String?
     @objc dynamic var thumbnail: Thumbnail?
 
@@ -36,13 +36,12 @@ class Character: Object, Codable {
     }
 }
 
-extension Character {
+extension Serie {
     enum CodingKeys: String, CodingKey {
         case id = "id"
-        case name = "name"
+        case title = "title"
         case thumbnail = "thumbnail"
         case desc = "description"
     }
 }
-
 

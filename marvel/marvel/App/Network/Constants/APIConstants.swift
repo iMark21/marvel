@@ -21,6 +21,7 @@ struct APIConstants {
     struct Path {
         static let characters = "/v1/public/characters"
         static let comics = "/comics"
+        static let series = "/series"
     }
     
     struct ParamKeys {

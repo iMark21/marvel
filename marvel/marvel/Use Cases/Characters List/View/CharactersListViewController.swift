@@ -18,10 +18,9 @@ class CharactersListViewController: UIViewController {
     // MARK: Public vars
     var viewModel: CharactersListViewModelProtocol?
     var dataSource: RxTableViewSectionedAnimatedDataSource<ComponentsDataSource>?
-        
+    
     // MARK: Private RX vars
     private let disposeBag = DisposeBag()
-    private let appSchedulers = MarvelAppSchedulers()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,15 +40,7 @@ class CharactersListViewController: UIViewController {
     
     private func setupTableView() {
         
-        tableView.register(UINib(
-            nibName: CharacterComponentViewModel
-                .Constants
-                .cellIdentifier,
-            bundle: nil
-            ), forCellReuseIdentifier: CharacterComponentViewModel
-                .Constants
-                .cellIdentifier
-        )
+        tableView.registerCell(type: CharacterComponent.self)
         
         ///Row selected
         tableView
@@ -84,26 +75,23 @@ class CharactersListViewController: UIViewController {
     
     private func setupDataSource() {
         dataSource = RxTableViewSectionedAnimatedDataSource<ComponentsDataSource>(
-        configureCell: { dataSource, tableView, indexPath, component in
-            guard let cell = tableView.dequeueReusableCell(
-                    withIdentifier: CharacterComponentViewModel
-                        .Constants
-                        .cellIdentifier) as? CharacterComponent else {
-                
-                return UITableViewCell()
-            }
-            cell.setup(component: component)
-            return cell
-        })
+            configureCell: { dataSource, tableView, indexPath, component in
+                guard let cell = tableView.dequeueCell(withType: CharacterComponent.self)
+                        as? CharacterComponent else {
+                    return UITableViewCell()
+                }
+                cell.setup(component: component)
+                return cell
+            })
         
         dataSource?.decideViewTransition = { (_, _, _)  in return RxDataSources.ViewTransition.reload }
-
+        
     }
     
     private func bindData() {
         guard let dataSource = dataSource else { return }
         tableView.dataSource = nil
-
+        
         viewModel?.output.dataSource
             .asDriver(onErrorJustReturn: [])
             .map { $0 }
@@ -116,7 +104,7 @@ class CharactersListViewController: UIViewController {
             .rx
             .reachedBottom()
             .skip(1)
-
+        
         loadNextPage
             .asObservable()
             .throttle(.milliseconds(500),
@@ -132,26 +120,28 @@ class CharactersListViewController: UIViewController {
     }
     
     // MARK: - Setup ViewModel
-
+    
     private func setupViewModel() {
+        let loadingViewController = LoadingViewController()
+
         viewModel?.output
             .state
             .subscribe(onNext: { [weak self] state in
-                //Evaluate state of view
+                /// Evaluate state of view
                 switch state {
                 case .loading:
-                    Log.debug("State Loading")
+                    self?.add(loadingViewController)
                 case .nextPage:
                     self?.tableView.addLoading() {}
                 case .loaded:
-                    Log.debug("State Loaded")
+                    loadingViewController.remove()
                     self?.tableView.stopLoading()
                 case .error(let error):
-                    Log.debug("State " + error.localizedDescription)
+                    self?.showErrorAlert(error)
                 }
             }).disposed(by: disposeBag)
     }
-
+    
     private func setup() {
         viewModel?.setup()
     }

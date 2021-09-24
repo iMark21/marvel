@@ -15,10 +15,11 @@ protocol MarvelRepositoryProtocol {
     var databaseClient: DatabaseProtocol { get }
     
     /// Characters
-    func fetchCharacters(paginator: MarvelPager) -> Observable<[Character]>
+    func fetchCharacters(paginator: MarvelPager) -> Observable<[Character]?>
     
-    /// Comics
+    /// Media
     func fetchComics(characterId: Int) -> Observable<[Comic]>
+    func fetchSeries(characterId: Int) -> Observable<[Serie]>
 }
 
 struct MarvelPager {
@@ -56,7 +57,7 @@ class MarvelRepository: MarvelRepositoryProtocol {
     
     // MARK: - Characters
     
-    func fetchCharacters<T: Codable & Object>(paginator: MarvelPager) -> Observable<[T]> {
+    func fetchCharacters<T: Codable & Object>(paginator: MarvelPager) -> Observable<[T]?> {
         let request = CharactersRequest.init(
             offset: paginator.offset,
             limit: paginator.limit
@@ -65,21 +66,21 @@ class MarvelRepository: MarvelRepositoryProtocol {
         let observeResponse: Observable<CharactersListResponse> =
             fetchNetworkRequest(request: request)
         let fetchRequest = observeResponse
-            .flatMap { response -> Observable<[T]> in
+            .flatMap { response -> Observable<[T]?> in
                 if let result = response.data?.results?
                     .compactMap({$0}) as? [T] {
                     return .just(result)
                 }
-                return .just([])
-        }
+                return .just(nil)
+            }
         
         /// Try to load DB - Network
         if paginator.isFirstPage {
-            return Observable<[T]>.concat(
+            return Observable<[T]?>.concat(
                 fetchLocal(type: T.self),
                 fetchRequest
                     .observe(on: appSchedulers.main)
-                    .flatMap { result -> Observable<[T]> in
+                    .flatMap { result -> Observable<[T]?> in
                         self.saveObjects(objects: result)
                         return .just(result)
                 }
@@ -93,9 +94,36 @@ class MarvelRepository: MarvelRepositoryProtocol {
     
     // MARK: - Comics
     
-    func fetchComics(characterId: Int) -> Observable<[Comic]> {
+    func fetchComics<T: Codable & Object>(characterId: Int) -> Observable<[T]> {
         let request = ComicsRequest.init(characterId: characterId)
-        return fetchNetworkRequest(request: request)
+        
+        let observeResponse: Observable<ComicsListResponse> =
+            fetchNetworkRequest(request: request)
+        return observeResponse
+            .flatMap { response -> Observable<[T]> in
+                if let result = response.data?.results?
+                    .compactMap({$0}) as? [T] {
+                    return .just(result)
+                }
+                return .just([])
+        }
+    }
+    
+    // MARK: - Series
+    
+    func fetchSeries<T: Codable & Object>(characterId: Int) -> Observable<[T]> {
+        let request = SeriesRequest.init(characterId: characterId)
+        
+        let observeResponse: Observable<SeriesListResponse> =
+            fetchNetworkRequest(request: request)
+        return observeResponse
+            .flatMap { response -> Observable<[T]> in
+                if let result = response.data?.results?
+                    .compactMap({$0}) as? [T] {
+                    return .just(result)
+                }
+                return .just([])
+        }
     }
     
 }
@@ -104,11 +132,11 @@ class MarvelRepository: MarvelRepositoryProtocol {
 
 extension MarvelRepository {
     
-    func fetchLocal<T: Codable & Object>(type: T.Type) -> Observable<[T]> {
+    func fetchLocal<T: Codable & Object>(type: T.Type) -> Observable<[T]?> {
         return self.databaseClient.get(type: type)
     }
     
-    func saveObjects<T: Codable & Object>(objects: [T]) {
+    func saveObjects<T: Codable & Object>(objects: [T]?) {
         self.databaseClient.save(objects: objects)
     }
     

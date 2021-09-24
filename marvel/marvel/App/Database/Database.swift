@@ -12,8 +12,8 @@ import RxRealm
 import RxSwift
 
 protocol DatabaseProtocol {
-    func save<T: Object & Codable>(objects: [T?]?)
-    func get<T: Object & Codable>(type: T.Type) -> Observable<[T]>
+    func save<T: Object & Codable>(objects: [T]?)
+    func get<T: Object & Codable>(type: T.Type) -> Observable<[T]?>
     func observe<T: Object>(type: T.Type) -> Observable<[T]>
 }
 
@@ -27,23 +27,21 @@ class Database: DatabaseProtocol {
         self.appSchedulers = MarvelAppSchedulers()
     }
     
-    func get<T: Object>(type: T.Type) -> Observable<[T]> {
+    func get<T: Object>(type: T.Type) -> Observable<[T]?> {
         do {
             let realm = try Realm()
             let objs = realm.objects(type).toArray()
-            return .just(objs)
+            return objs.count > 0 ? .just(objs) : .just(nil)
         } catch _ {
-            return .just([])
+            return .just(nil)
         }
     }
     
-    func save<T: Object>(objects: [T?]?) {
+    func save<T: Object>(objects: [T]?) {
         if let realm = try? Realm(),
            let objects = objects {
 
-            let result = objects.compactMap { $0 }
-
-            Observable.from(result)
+            Observable.from(objects)
                 .subscribe(realm.rx.add(update: .modified))
                 .disposed(by: disposeBag)
         }

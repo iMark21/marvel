@@ -89,9 +89,9 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
             .subscribe(on: input.appSchedulers.background)
             .observe(on: input.appSchedulers.main)
             .subscribe(onNext: { [weak self] result in
+                guard let result = result else { return }
                 self?.appendCharacters(result)
             }, onError: { [weak self] error in
-                Log.debug(error.localizedDescription)
                 self?.output.state.onNext(.error(error))
             }).disposed(by: disposeBag)
     }

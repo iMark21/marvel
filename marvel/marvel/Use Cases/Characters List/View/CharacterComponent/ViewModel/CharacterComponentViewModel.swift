@@ -25,10 +25,6 @@ extension CharacterComponentViewModel {
         let name: String?
         let description: String?
     }
-    
-    struct Constants {
-        static let cellIdentifier = "CharacterComponent"
-    }
 }
 
 // MARK: - CharacterComponentViewModel
@@ -43,13 +39,7 @@ class CharacterComponentViewModel: CharacterComponentProtocol {
             character: character
         )
         self.output = Output.init(
-            imageUrl: URL(
-                string: (
-                    (character.thumbnail?.url ?? "") +
-                        "." +
-                        (character.thumbnail?.mimeType ?? "")
-                )
-            ),
+            imageUrl: character.thumbnail?.getImageUrl(),
             name: character.name,
             description: character.desc
         )
