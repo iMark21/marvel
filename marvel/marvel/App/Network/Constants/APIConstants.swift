@@ -9,11 +9,6 @@ import Foundation
 
 struct APIConstants {
     
-    struct Keys {
-        static let publicKey = "d66fc31f297d190217a31ee824e96911"
-        static let privateKey = "206dcf5f94cfee8a69d52e034e0e0ea99dbf715d"
-    }
-    
     struct URL {
         static let baseUrl = "https://gateway.marvel.com"
     }
@@ -30,5 +25,36 @@ struct APIConstants {
         static let ts = "ts"
         static let offset = "offset"
         static let limit = "limit"
+    }
+    
+    // MARK: API - KEYS
+    
+    struct Keys {
+        static var filePath: String {
+            // 1
+            guard let filePath = Bundle.main.path(forResource: "Marvel-Info", ofType: "plist") else {
+                fatalError("Couldn't find file 'Marvel-Info.plist'.")
+            }
+            return filePath
+        }
+        static var publicKey : String {
+            get {
+                let plist = NSDictionary(contentsOfFile: filePath)
+                guard let value = plist?.object(forKey: "PUBLIC_KEY") as? String else {
+                    fatalError("Couldn't find key 'PUBLIC_KEY' in 'Marvel-Info.plist'.")
+                }
+                return value
+            }
+        }
+        
+        static var privateKey : String {
+            get {
+                let plist = NSDictionary(contentsOfFile: filePath)
+                guard let value = plist?.object(forKey: "PRIVATE_KEY") as? String else {
+                    fatalError("Couldn't find key 'PRIVATE_KEY' in 'Marvel-Info.plist'.")
+                }
+                return value
+            }
+        }
     }
 }
