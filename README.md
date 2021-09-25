@@ -6,7 +6,7 @@
 - Base on [sergdort/CleanArchitectureRxSwift](https://github.com/sergdort/CleanArchitectureRxSwift)
 - Using [RxSwift](https://github.com/ReactiveX/RxSwift) - Reactive Programming in Swift 
 - Using [RxDataSources](https://github.com/RxSwiftCommunity/RxDataSources) - to manage data sources in collection and table views with RxSwift
-- Using [Realm & RxRealm](https://github.com/RxSwiftCommunity/RxDataSources) - to save data. (Only for heroes list).
+- Using [Realm & RxRealm](https://github.com/RxSwiftCommunity/RxDataSources) - to save data. (Characters).
 - Using [Coordinators](https://blog.kulman.sk/architecting-ios-apps-coordinators/) to control the navigation flow of the application
 - Using [Composition](https://medium.com/commencis/reusability-and-composition-in-swift-6630fc199e16) to avoid making use of baseviewcontroller
 - Using [Codable](https://www.swiftbysundell.com/basics/codable) to mapping data response
@@ -17,14 +17,22 @@
 ### Screenshots
 <img src="list.png" width="250"> <img src="detail.png" width="250">
 
-### Available Actions 
-Run tests in Terminal
+### Project 
+
+#### Install
+  * Before starting
+    - Run `pod install`
+    - Get your Marvel API Keys [Here](https://developer.marvel.com)
+    - Set your API Keys into the Marvel-Info.plist
+    - Open `marvel.xcworkspace`
+    - Execute the application, explore it manually and make yourself familiar with the code.
+    
+  * Run tests in Terminal
 ```
 fastlane tests
 ```
 
-### Application Structure
-
+#### Structure
 - APP
   - Coordinator
   - Database
