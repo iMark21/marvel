@@ -40,20 +40,22 @@ struct APIConstants {
         static var publicKey : String {
             get {
                 let plist = NSDictionary(contentsOfFile: filePath)
-                guard let value = plist?.object(forKey: "PUBLIC_KEY") as? String else {
-                    fatalError("Couldn't find key 'PUBLIC_KEY' in 'Marvel-Info.plist'.")
+                if let value = plist?.object(forKey: "PUBLIC_KEY") as? String,
+                      value.isEmpty == false {
+                    return value
                 }
-                return value
+                fatalError("Couldn't find key 'PUBLIC_KEY' in 'Marvel-Info.plist'.")
             }
         }
         
         static var privateKey : String {
             get {
                 let plist = NSDictionary(contentsOfFile: filePath)
-                guard let value = plist?.object(forKey: "PRIVATE_KEY") as? String else {
-                    fatalError("Couldn't find key 'PRIVATE_KEY' in 'Marvel-Info.plist'.")
+                if let value = plist?.object(forKey: "PRIVATE_KEY") as? String,
+                   value.isEmpty == false {
+                    return value
                 }
-                return value
+                fatalError("Couldn't find key 'PRIVATE_KEY' in 'Marvel-Info.plist'.")
             }
         }
     }
