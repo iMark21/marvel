@@ -64,7 +64,9 @@ class CharactersListViewModel: CharactersListViewModelProtocol {
         )
         self.paginator = MarvelPager.init(
             offset: 0,
-            limit: 20
+            limit: APIConstants
+                .ParamValues
+                .pagerDefaultValue
         )
         self.dataSource = [
             ComponentsDataSource.init(
