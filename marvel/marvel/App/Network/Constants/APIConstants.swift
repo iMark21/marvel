@@ -27,6 +27,10 @@ struct APIConstants {
         static let limit = "limit"
     }
     
+    struct ParamValues {
+        static let pagerDefaultValue = 20
+    }
+    
     // MARK: API - KEYS
     
     struct Keys {
