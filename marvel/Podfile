@@ -19,10 +19,6 @@ target 'marvel' do
     pod 'RxBlocking'
     pod 'RxTest'
   end
-
-  target 'marvelUITests' do
-    # Pods for testing
-  end
 end
 
 post_install do |installer|
